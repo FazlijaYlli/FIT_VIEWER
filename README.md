@@ -1,2 +1,9 @@
-# FIT_VIEWER
-This is the repository for my graduation project. FIT_VIEWER is a PHP &amp; JS website where you are able to upload a ".fit" file, and view all of its content with graphics and statistics, all dynamically generated.
+## FIT File Viewer
+### What is FIT File Viewer ?
+Fit File Viewer, or FFV, is a dynamic website where you can upload a .fit file and then view its content on the website, using dynamically generated statistics and graphs.
+
+### How is it made ?
+Currently, the website will use PHP and JS (mostly npm packages) for its back-end.
+On the front-end, I am simply using Bootstrap to provide a nice, dark and simple appearance to the website.
+
+
