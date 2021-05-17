@@ -1,0 +1,17 @@
+{
+    "name": "adriangibbons/php-fit-file-analysis",
+    "type": "library",
+    "description": "A PHP class for analysing FIT files created by Garmin GPS devices",
+    "keywords": ["garmin", "fit"],
+    "homepage": "https://github.com/adriangibbons/php-fit-file-analysis",
+    "require-dev": {
+        "phpunit/phpunit": "4.8.*",
+        "squizlabs/php_codesniffer": "2.*",
+        "satooshi/php-coveralls": "^2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "adriangibbons\\": "src/"
+        }
+    }
+}
