@@ -12,7 +12,7 @@ $errors = array();
 include('../../vendor/adriangibbons/php-fit-file-analysis/src/phpFITFileAnalysis.php');  // this file is in the project's root folder
 $options = [
     'units'                   => 'metric',
-    'pace'                    => false,
+    'pace'                    => false
 ];
 
         // Si l'utilisateur vient de la page upload.php, en utilisant le bouton submit
@@ -42,7 +42,7 @@ $options = [
                     /// AFFICHAGE DU SITE ///
                     /////////////////////////
 
-                    echo '
+                    ?>
                     <html>
                     <head>
                         <meta charset="UTF-8">
@@ -52,57 +52,108 @@ $options = [
                         <title>Visualiseur</title>
                     </head>
                     <body style="display:flex; flex-direction: column; align-items: center;">
-                      ';
+                    <header>
+                        <?php include_once 'header.php'?>
+                    </header>
+                    <?php
 
                     // Création de l'objet php-fit-file-analysis
                     $pFFA = new adriangibbons\phpFITFileAnalysis($_FILES['inputFile']['tmp_name'], $options);
 
-                    // Set de la timezone
-                    date_default_timezone_set('Europe/Paris');
-
                     // Affichage de la durée totale de la course.
-                    // (Date de fin - Date de début) - 1h = Durée totale
-                    $duration = date("H:i:s",(end($pFFA->data_mesgs['record']['timestamp']) - $pFFA->data_mesgs['record']['timestamp'][1]) - 3600);
                     echo '<button onclick="Show(\'duration\')">Afficher la durée totale</button>';
                     echo '<div id="duration" style="display:none;">';
-                    echo $duration;
+                    // gmdate utilise Fuseau horaire de Greenwich
+                    // => Pas besoin de soustraire ou d'addition le fuseau horaire du serveur !
+                    echo gmdate('H:i:s', floor($pFFA->data_mesgs['session']['total_elapsed_time']));
                     echo '</div>';
 
-                    // Si le fichier contient des données de vitesse, on les affiche, Sinon, message d'erreur.
-                    if(isset($pFFA->data_mesgs['record']['speed']))
-                    {
-                        // Affichage de la vitesse minimum, moyenne, maximum
-                        echo '
+
+                    // Affichage de la vitesse minimum, moyenne, maximum
+                    echo '
                           <button onclick="Show(\'speed\')">Vitesses</button>
                           <div id="speed" style="display: none">
                     ';
-                        echo "Max : " . max($pFFA->data_mesgs['record']['speed']) . " km/h<br>";
-                        echo "Average : " . (array_sum($pFFA->data_mesgs['record']['speed']) / count($pFFA->data_mesgs['record']['speed'])) . "  km/h<br>";
-                        echo "Min : " . min($pFFA->data_mesgs['record']['speed']) . "  km/h<br>";
-                        echo '</div>';
+                    // Si le fichier contient des données de vitesse, on les affiche, Sinon, message d'erreur.
+                    if(isset($pFFA->data_mesgs['record']['speed']))
+                    {
+                        $speed = $pFFA->data_mesgs['record']['speed'];
+                        echo "Max : ".max($speed). " km/h<br>";
+                        echo "Average : ".floor((array_sum($speed) / count($speed)))."  km/h<br>";
+                        echo "Min : ".min($speed) . "  km/h<br>";
                     }
                     else {
                         echo 'La vitesse n\'est pas indiquée dans ce fichier !';
                     }
+                    echo '</div>';
 
-                    // Si le fichier contient des données de puissances, on les affiche. Sinon, message d'erreur.
-                    if(isset($pFFA->data_mesgs['record']['power']))
-                    {
-                        // Affichage de la puissance minimum, moyenne, et maximum.
-                        echo '
-                          <button onclick="Show(\'power\')">Puissance</button>
-                          <div id="power" style="display: none">
+                    // Affichage des infos comme le produit sur lequel les données furent collectées, le constructeur et le type de sport effectué le long du parcours.
+                    echo '
+                      <button onclick="Show(\'infos\')">Infos</button>
+                      <div id="infos" style="display: none">
                     ';
 
-                        echo "Max : " . max($pFFA->data_mesgs['record']['power']) . " W<br>";
-                        echo "Average : " . (array_sum($pFFA->data_mesgs['record']['power']) / count($pFFA->data_mesgs['record']['power'])) . " W<br>";
-                        echo "Min : " . min($pFFA->data_mesgs['record']['power']) . "  W<br>";
-                        echo '</div>';
+                    if(isset($pFFA->data_mesgs['device_info']['product']))
+                    {
+                        echo 'PRODUCT : '.$pFFA->product().'<br>';
+                    } else { echo 'PRODUCT : UNKNOWN <br>'; }
+
+                    if(isset($pFFA->data_mesgs['device_info']['manufacturer']))
+                    {
+                        echo 'MANUFACTURER : '.$pFFA->manufacturer().'<br>';
+                    } else { echo 'MANUFACTURER : UNKNOWN <br>'; }
+
+                    if(isset($pFFA->data_mesgs['session']['sport']))
+                    {
+                        echo 'SPORT : '.$pFFA->sport().'<br>';
+                    } else { echo 'SPORT : UNKNOWN <br>'; }
+
+                    echo '</div>';
+
+
+                    // Si le fichier contient des données d'altitude, on les affiche. Sinon, message d'erreur.
+                    if(isset($pFFA->data_mesgs['record']['altitude']))
+                    {
+                        // Affichage de l'élévation durant le parcours.
+                        // Affichage de l'altitude minimum, moyennne, et maximum.
+                        echo '
+                          <button onclick="Show(\'altitude\')">Altitude</button>
+                          <div id="altitude" style="display: none">
+                        ';
+                        $altitude = $pFFA->data_mesgs['record']['altitude'];
+                        echo "Max : ".max($altitude)." m<br>";
+                        echo "Average : ".floor((array_sum($altitude) / count($altitude)))." m<br>";
+                        echo "Min : ".min($altitude)."  m<br>";
                     }
                     else
                     {
-                        echo 'La puissance n\'est pas indiquée dans ce fichier !';
+                        echo '
+                          <button onclick="Show(\'altitude\')">Altitude</button>
+                          <div id="altitude" style="display: none">
+                        ';
+                        echo 'L\'altitude n\'est pas indiquée dans ce fichier ! <br>';
                     }
+                    echo '</div>';
+
+                    // Si le fichier contient des données d'énergie, on les affiche. Sinon, message d'erreur.
+                    echo '
+                      <button onclick="Show(\'power\')">Puissance</button>
+                      <div id="power" style="display: none">
+                    ';
+                    if(isset($pFFA->data_mesgs['record']['power']))
+                    {
+                        // Affichage de l'énergie minimum, moyenne, et maximum, en watt.
+                        // On affiche aussi les KiloJoules, obtenu avec la méthode "powerMetrics" retournant différentes valeurs, dont les KJ, selon le fichier.
+                        $power = $pFFA->data_mesgs['record']['power'];
+                        echo "Max : " . max($power) . " W<br>";
+                        echo "Average : " . floor((array_sum($power) / count($power))) . " W<br>";
+                        echo "Min : " . min($power) . "  W<br>";
+                    }
+                    else
+                    {
+                        echo 'La puissance n\'est pas indiquée dans ce fichier ! <br>';
+                    }
+                    echo '</div>';
 
                     // Si le fichier contient des données de BPM, on les affiche. Sinon, message d'erreur.
                     if(isset($pFFA->data_mesgs['record']['heart_rate']))
@@ -112,23 +163,28 @@ $options = [
                           <button onclick="Show(\'bpm\')">BPM</button>
                           <div id="bpm" style="display: none">
                         ';
-
-                        echo "Max : ".max($pFFA->data_mesgs['record']['heart_rate'])." BPM<br>";
-                        echo "Average : ".(array_sum($pFFA->data_mesgs['record']['heart_rate']) / count($pFFA->data_mesgs['record']['heart_rate']))." BPM<br>";
-                        echo "Min : ".min($pFFA->data_mesgs['record']['heart_rate'])."  BPM<br>";
-                        echo '</div>';
+                        $bpm = $pFFA->data_mesgs['record']['heart_rate'];
+                        echo "Max : ".max($bpm)." BPM<br>";
+                        echo "Average : ".floor((array_sum($bpm) / count($bpm)))." BPM<br>";
+                        echo "Min : ".min($bpm)."  BPM<br>";
                     }
                     else
                     {
-                        echo 'Les BPM n\'est pas indiquée dans ce fichier !';
+                        echo '
+                          <button onclick="Show(\'power\')">Puissance</button>
+                          <div id="power" style="display: none">
+                        ';
+                        echo 'Les BPM ne sont pas indiqués dans ce fichier ! <br>';
                     }
+                    echo '</div>';
+
+
 
                     // Affichage de la chaque point, avec les données qui correspondent à ce point à côté.
                     echo '
                         <button onclick="Show(\'pointsWithUnknown\')">All points (With unknown data)</button>
                         <div id="pointsWithUnknown" style="display: none; flex-direction: row; flex-wrap: wrap; justify-content: space-between; width: 80%; margin: auto">
                     ';
-
                     foreach($pFFA->data_mesgs['record']['timestamp'] as $timestamp)
                     {
                         echo '<div style="margin: 10px; text-align: center;">';
@@ -140,11 +196,22 @@ $options = [
                             // AFFICHAGE DE LA VITESSE
                             if(isset($pFFA->data_mesgs['record']['speed'][$timestamp]))
                             {
-                                echo 'SPEED : '.$pFFA->data_mesgs['record']['speed'][$timestamp];
+                                echo 'SPEED : '.($pFFA->data_mesgs['record']['speed'][$timestamp]);
                             }
                             else
                             {
                                 echo 'SPEED : UNKNOWN';
+                            }
+                            echo '<br>';
+
+                            // AFFICHAGE DE L'ALTITUDE
+                            if(isset($pFFA->data_mesgs['record']['altitude'][$timestamp]))
+                            {
+                                echo 'ALTITUDE : '.$pFFA->data_mesgs['record']['altitude'][$timestamp];
+                            }
+                            else
+                            {
+                                echo 'ALTITUDE : UNKNOWN';
                             }
                             echo '<br>';
 
@@ -218,6 +285,17 @@ $options = [
                             }
                             echo '<br>';
 
+                            // AFFICHAGE DE L'ALTITUDE
+                            if(isset($pFFA->data_mesgs['record']['altitude'][$timestamp]))
+                            {
+                                echo 'ALTITUDE : '.$pFFA->data_mesgs['record']['altitude'][$timestamp];
+                            }
+                            else
+                            {
+                                echo 'ALTITUDE : UNKNOWN';
+                            }
+                            echo '<br>';
+
                             // AFFICHAGE DES WATTS
                             if(isset($pFFA->data_mesgs['record']['power'][$timestamp]))
                             {
@@ -233,8 +311,12 @@ $options = [
                     }
                     echo '</div>';
 
-                    echo '
+                    ?>
+
+
+
                         <footer>
+                            <?php include_once 'footer.php' ?>
                             <script>
                                 function Show(id) {
                                     var x = document.getElementById(id);
@@ -248,7 +330,7 @@ $options = [
                         </footer>
                     </body>
                     </html>
-                    ';
+                    <?php
                 }
                 else
                 {
