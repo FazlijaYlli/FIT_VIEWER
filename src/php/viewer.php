@@ -23,8 +23,9 @@ $options = [
 
             if($_FILES['inputFile']['size'] > 0)
             {
+                $extensions = ['fit','FIT'];
                 // Vérification de l'extension.
-                if(pathinfo($_FILES['inputFile']['name'])['extension'] != 'fit')
+                if(in_array(pathinfo($_FILES['inputFile']['name'])['extension'] != 'fit', $extensions))
                 {
                     $errors[] = "Le fichier téléchargé n'était pas un fichier FIT.";
                 }
@@ -66,6 +67,12 @@ $options = [
                     // gmdate utilise Fuseau horaire de Greenwich
                     // => Pas besoin de soustraire ou d'addition le fuseau horaire du serveur !
                     echo gmdate('H:i:s', floor($pFFA->data_mesgs['session']['total_elapsed_time']));
+                    echo '</div>';
+
+                    // Affichage de la distance totale parcourue.
+                    echo '<button onclick="Show(\'distance\')">Afficher la distance totale</button>';
+                    echo '<div id="distance" style="display:none;">';
+                    echo $pFFA->data_mesgs['session']['total_distance'].' km';
                     echo '</div>';
 
 
@@ -215,6 +222,17 @@ $options = [
                             }
                             echo '<br>';
 
+                            // AFFICHAGE DE LA DISTANCE
+                            if(isset($pFFA->data_mesgs['record']['distance'][$timestamp]))
+                            {
+                                echo 'DISTANCE : '.$pFFA->data_mesgs['record']['distance'][$timestamp];
+                            }
+                            else
+                            {
+                                echo 'DISTANCE : UNKNOWN';
+                            }
+                            echo '<br>';
+
                             // AFFICHAGE DES BPM
                             if(isset($pFFA->data_mesgs['record']['heart_rate'][$timestamp]))
                             {
@@ -312,14 +330,205 @@ $options = [
                     echo '</div>';
 
                     ?>
+                    <button onclick="Show('multiChart')">Graphique</button>
+                    <div id="multiChart" style="display: none; width: 95%; height: 800px;">
+                        <canvas id="multiGraph" width="800" height="400"></canvas>
+                    </div>
 
-
-
-                        <footer>
+                    <footer>
                             <?php include_once 'footer.php' ?>
+                            <?php
+                                $altitudeJS = array();
+                                $speedJS = array();
+                                $count = count($pFFA->data_mesgs['record']['timestamp']);
+                                $i = 0;
+                                foreach($pFFA->data_mesgs['record']['timestamp'] as $timestamp)
+                                {
+                                    if($i % 10 == 1)
+                                    {
+                                        if(isset($pFFA->data_mesgs['record']['speed'][$timestamp])) { $speedJS[] = $pFFA->data_mesgs['record']['speed'][$timestamp]; };
+                                        if(isset($pFFA->data_mesgs['record']['heart_rate'][$timestamp])) { $bpmJS[] = $pFFA->data_mesgs['record']['heart_rate'][$timestamp]; };
+                                        if(isset($pFFA->data_mesgs['record']['altitude'][$timestamp]) && $pFFA->data_mesgs['record']['altitude'][$timestamp] != 0) { $altitudeJS[] = $pFFA->data_mesgs['record']['altitude'][$timestamp]; }
+                                        //$powerJS[] = $pFFA->data_mesgs['record']['power'][$timestamp];
+                                    }
+                                    $i++;
+                                }
+                            ?>
+                            <script src="https://cdn.jsdelivr.net/npm/chart.js@3.2.1/dist/chart.min.js" integrity="sha256-uVEHWRIr846/vAdLJeybWxjPNStREzOlqLMXjW/Saeo=" crossorigin="anonymous"></script>
+                            <script type="text/javascript">
+                                var count = <?php echo $count; ?>;
+                                var altitudeArray = <?php echo json_encode($altitudeJS); ?>;
+                                var bpmArray = <?php echo json_encode($bpmJS); ?>;
+                                var speedArray = <?php echo json_encode($speedJS); ?>;
+                                var numbersArray = [];
+                                for (i = 0; i < count ; i++)
+                                {
+                                    ////////////////////////////////////////////////////////////////////////////////////////////////////////
+                                    /// CODE REPRIS DE STACK OVERFLOW //////////////////////////////////////////////////////////////////////
+                                    /// AUTEUR : ARON ROTTVEEL /////////////////////////////////////////////////////////////////////////////
+                                    /// LIEN : https://stackoverflow.com/questions/847185/convert-a-unix-timestamp-to-time-in-javascript ///
+                                    ////////////////////////////////////////////////////////////////////////////////////////////////////////
+                                    if(i % 10 === 0)
+                                    {
+                                        let unix_timestamp = i;
+                                        // Create a new JavaScript Date object based on the timestamp
+                                        // multiplied by 1000 so that the argument is in milliseconds, not seconds.
+                                        var date = new Date(unix_timestamp * 1000);
+                                        // Hours part from the timestamp
+                                        var hours = date.getHours();
+                                        // Minutes part from the timestamp
+                                        var minutes = "0" + date.getMinutes();
+                                        // Seconds part from the timestamp
+                                        var seconds = "0" + date.getSeconds();
+
+                                        var formattedTime = hours - 1 + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
+
+                                        numbersArray.push(formattedTime);
+                                    }
+                                }
+
+                                console.log(altitudeArray);
+                                console.log(speedArray);
+                                console.log(numbersArray);
+
+                                //CHART DATA
+                                const multiData ={
+                                    labels: numbersArray,
+                                    datasets: [{
+                                        label: '  Altitude ',
+                                        //Styling
+                                        backgroundColor: 'rgb(255,0,0)',
+                                        borderColor: 'rgb(255,0,0)',
+                                        borderWidth: 4,
+                                        pointRadius: 2,
+                                        data: altitudeArray,
+                                        yAxisID: 'y',
+                                    },{
+                                        label: '  BPM ',
+                                        //Styling
+                                        backgroundColor: 'rgb(0,255,0)',
+                                        borderColor: 'rgb(0,255,0)',
+                                        borderWidth: 4,
+                                        pointRadius: 2,
+                                        data: bpmArray,
+                                        yAxisID: 'y1',
+                                    },{
+                                        label: '  Speed ',
+                                        //Styling
+                                        backgroundColor: 'rgb(0,0,255)',
+                                        borderColor: 'rgb(0,0,255)',
+                                        borderWidth: 4,
+                                        pointRadius: 2,
+                                        data: speedArray,
+                                        yAxisID: 'y2',
+                                    }],
+                                };
+
+                                //CHART CONFIG
+                                function returnConfig(dataToShow) {
+                                    const config = {
+                                        //Type of chart
+                                        type: 'line',
+                                        //Inserting the data above.
+                                        data: dataToShow,
+                                        options: {
+                                            //With these options I am able to resize the graph.
+                                            responsive: true,
+                                            maintainAspectRatio: false,
+                                            scales: {
+                                                x: {
+                                                    display: true,
+                                                    ticks: {
+                                                        display: true,
+                                                    },
+                                                    title: {
+                                                        display: true,
+                                                        font: {
+                                                            size: 20,
+                                                            weight: 'bold',
+                                                        },
+                                                        text: "Track Points",
+                                                        align: 'center'
+                                                    }
+                                                },
+                                                y: {
+                                                    display: true,
+                                                    type: 'linear',
+                                                    ticks: {
+                                                        callback: function (val) {
+                                                            return "";
+                                                        },
+                                                    },
+                                                    title: {
+                                                        display: true,
+                                                        font: {
+                                                            size: 20,
+                                                            weight: 'bold',
+                                                        },
+                                                        text: "",
+                                                        align: 'center'
+                                                    }
+                                                },
+                                                y1: {
+                                                    display: false,
+                                                    title: {
+                                                        display: true,
+                                                        font: {
+                                                            size: 20,
+                                                            weight: 'bold',
+                                                        },
+                                                        text: "",
+                                                        align: 'center'
+                                                    }
+                                                },
+                                                y2: {
+                                                    display: false,
+                                                    title: {
+                                                        display: true,
+                                                        font: {
+                                                            size: 20,
+                                                            weight: 'bold',
+                                                        },
+                                                        text: "",
+                                                        align: 'center'
+                                                    }
+                                                }
+                                            },
+                                            interaction : {
+                                                mode : 'index',
+                                                axis: 'y'
+                                            },
+                                            plugins : {
+                                                tooltip : {
+                                                    position: 'nearest',
+                                                    titleFont: {
+                                                        family: "'Helvetica','Arial','sans-serif'",
+                                                        size: 24,
+                                                        weight: 'bold',
+                                                    },
+                                                    bodyFont: {
+                                                        family: "'Helvetica','Arial','sans-serif'",
+                                                        size: 12,
+                                                        weight: 'normal',
+                                                    },
+                                                    bodySpacing: 10,
+                                                    padding: 20,
+                                                    boxWidth: 3,
+                                                }
+                                            }
+                                        }
+                                    };
+                                    return config;
+                                }
+
+                                var multiChart = new Chart (
+                                    document.getElementById('multiGraph'),
+                                    returnConfig(multiData)
+                                )
+                            </script>
                             <script>
                                 function Show(id) {
-                                    var x = document.getElementById(id);
+                                    const x = document.getElementById(id);
                                     if (x.style.display === "none") {
                                         x.style.display = "flex";
                                     } else {
