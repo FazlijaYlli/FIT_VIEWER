@@ -1,0 +1,15 @@
+{
+    "name": "ylli/fit_viewer",
+    "description": "Website used to view a FIT file using graphs and statistics.",
+    "type": "project",
+    "require": {
+        "adriangibbons/php-fit-file-analysis": "^3.2.0",
+      "ext-json": "*"
+    },
+    "authors": [
+        {
+            "name": "Ylli Fazlija",
+            "email": "fazlijaylli@gmail.com"
+        }
+    ]
+}
