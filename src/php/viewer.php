@@ -331,8 +331,8 @@ $options = [
 
                     ?>
                     <button onclick="Show('multiChart')">Graphique</button>
-                    <div id="multiChart" style="display: none; width: 95%; height: 800px;">
-                        <canvas id="multiGraph" width="800" height="400"></canvas>
+                    <div id="multiChart" style="display: none; width: 95%; height: 30%;">
+                        <canvas id="multiGraph"</canvas>
                     </div>
 
                     <footer>
@@ -344,22 +344,32 @@ $options = [
                                 $i = 0;
                                 foreach($pFFA->data_mesgs['record']['timestamp'] as $timestamp)
                                 {
-                                    if($i % 10 == 1)
+                                    if($i % 5 == 0)
                                     {
-                                        if(isset($pFFA->data_mesgs['record']['speed'][$timestamp])) { $speedJS[] = $pFFA->data_mesgs['record']['speed'][$timestamp]; };
-                                        if(isset($pFFA->data_mesgs['record']['heart_rate'][$timestamp])) { $bpmJS[] = $pFFA->data_mesgs['record']['heart_rate'][$timestamp]; };
-                                        if(isset($pFFA->data_mesgs['record']['altitude'][$timestamp]) && $pFFA->data_mesgs['record']['altitude'][$timestamp] != 0) { $altitudeJS[] = $pFFA->data_mesgs['record']['altitude'][$timestamp]; }
-                                        //$powerJS[] = $pFFA->data_mesgs['record']['power'][$timestamp];
+                                        if(isset($pFFA->data_mesgs['record']['power'][$timestamp]))
+                                        {
+                                            $powerJS[] = $pFFA->data_mesgs['record']['power'][$timestamp];
+                                        }
+                                        if(isset($pFFA->data_mesgs['record']['heart_rate'][$timestamp]))
+                                        {
+                                            $bpmJS[] = $pFFA->data_mesgs['record']['heart_rate'][$timestamp];
+                                        }
+                                        if(isset($pFFA->data_mesgs['record']['altitude'][$timestamp]) && $pFFA->data_mesgs['record']['altitude'][$timestamp] != 0)
+                                        {
+                                            $altitudeJS[] = $pFFA->data_mesgs['record']['altitude'][$timestamp];
+                                        }
                                     }
                                     $i++;
                                 }
                             ?>
                             <script src="https://cdn.jsdelivr.net/npm/chart.js@3.2.1/dist/chart.min.js" integrity="sha256-uVEHWRIr846/vAdLJeybWxjPNStREzOlqLMXjW/Saeo=" crossorigin="anonymous"></script>
                             <script type="text/javascript">
-                                var count = <?php echo $count; ?>;
+
                                 var altitudeArray = <?php echo json_encode($altitudeJS); ?>;
                                 var bpmArray = <?php echo json_encode($bpmJS); ?>;
-                                var speedArray = <?php echo json_encode($speedJS); ?>;
+                                var powerArray = <?php echo json_encode($powerJS); ?>;
+
+                                var count = <?php echo $count; ?>;
                                 var numbersArray = [];
                                 for (i = 0; i < count ; i++)
                                 {
@@ -368,7 +378,7 @@ $options = [
                                     /// AUTEUR : ARON ROTTVEEL /////////////////////////////////////////////////////////////////////////////
                                     /// LIEN : https://stackoverflow.com/questions/847185/convert-a-unix-timestamp-to-time-in-javascript ///
                                     ////////////////////////////////////////////////////////////////////////////////////////////////////////
-                                    if(i % 10 === 0)
+                                    if(i % 5 === 0)
                                     {
                                         let unix_timestamp = i;
                                         // Create a new JavaScript Date object based on the timestamp
@@ -388,14 +398,14 @@ $options = [
                                 }
 
                                 console.log(altitudeArray);
-                                console.log(speedArray);
+                                console.log(powerArray);
                                 console.log(numbersArray);
 
                                 //CHART DATA
                                 const multiData ={
                                     labels: numbersArray,
                                     datasets: [{
-                                        label: '  Altitude ',
+                                        label: ' (m) Altitude ',
                                         //Styling
                                         backgroundColor: 'rgb(255,0,0)',
                                         borderColor: 'rgb(255,0,0)',
@@ -413,117 +423,140 @@ $options = [
                                         data: bpmArray,
                                         yAxisID: 'y1',
                                     },{
-                                        label: '  Speed ',
+                                        label: ' (W) Power ',
                                         //Styling
                                         backgroundColor: 'rgb(0,0,255)',
                                         borderColor: 'rgb(0,0,255)',
                                         borderWidth: 4,
                                         pointRadius: 2,
-                                        data: speedArray,
+                                        data: powerArray,
                                         yAxisID: 'y2',
                                     }],
                                 };
 
                                 //CHART CONFIG
-                                function returnConfig(dataToShow) {
-                                    const config = {
-                                        //Type of chart
-                                        type: 'line',
-                                        //Inserting the data above.
-                                        data: dataToShow,
-                                        options: {
-                                            //With these options I am able to resize the graph.
-                                            responsive: true,
-                                            maintainAspectRatio: false,
-                                            scales: {
-                                                x: {
+                                const config = {
+                                    //Type of chart
+                                    type: 'line',
+                                    //Inserting the data above.
+                                    data: multiData,
+                                    options: {
+                                        //With these options I am able to resize the graph.
+                                        responsive: true,
+                                        maintainAspectRatio: false,
+                                        scales: {
+                                            x: {
+                                                display: true,
+                                                ticks: {
                                                     display: true,
-                                                    ticks: {
-                                                        display: true,
-                                                    },
-                                                    title: {
-                                                        display: true,
-                                                        font: {
-                                                            size: 20,
-                                                            weight: 'bold',
-                                                        },
-                                                        text: "Track Points",
-                                                        align: 'center'
-                                                    }
                                                 },
-                                                y: {
+                                                title: {
                                                     display: true,
-                                                    type: 'linear',
-                                                    ticks: {
-                                                        callback: function (val) {
-                                                            return "";
-                                                        },
-                                                    },
-                                                    title: {
-                                                        display: true,
-                                                        font: {
-                                                            size: 20,
-                                                            weight: 'bold',
-                                                        },
-                                                        text: "",
-                                                        align: 'center'
-                                                    }
-                                                },
-                                                y1: {
-                                                    display: false,
-                                                    title: {
-                                                        display: true,
-                                                        font: {
-                                                            size: 20,
-                                                            weight: 'bold',
-                                                        },
-                                                        text: "",
-                                                        align: 'center'
-                                                    }
-                                                },
-                                                y2: {
-                                                    display: false,
-                                                    title: {
-                                                        display: true,
-                                                        font: {
-                                                            size: 20,
-                                                            weight: 'bold',
-                                                        },
-                                                        text: "",
-                                                        align: 'center'
-                                                    }
-                                                }
-                                            },
-                                            interaction : {
-                                                mode : 'index',
-                                                axis: 'y'
-                                            },
-                                            plugins : {
-                                                tooltip : {
-                                                    position: 'nearest',
-                                                    titleFont: {
-                                                        family: "'Helvetica','Arial','sans-serif'",
-                                                        size: 24,
+                                                    font: {
+                                                        size: 20,
                                                         weight: 'bold',
                                                     },
-                                                    bodyFont: {
-                                                        family: "'Helvetica','Arial','sans-serif'",
-                                                        size: 12,
-                                                        weight: 'normal',
+                                                    text: "Track Points",
+                                                    align: 'center'
+                                                }
+                                            },
+                                            y: {
+                                                display: true,
+                                                type: 'linear',
+                                                grid: {
+                                                    borderColor: 'red'
+                                                },
+                                                ticks: {
+                                                    color: 'red',
+                                                    callback: function (val) {
+                                                        return val + " m";
                                                     },
-                                                    bodySpacing: 10,
-                                                    padding: 20,
-                                                    boxWidth: 3,
+                                                },
+                                                title: {
+                                                    display: true,
+                                                    font: {
+                                                        size: 20,
+
+                                                        weight: 'bold',
+                                                    },
+                                                    text: "",
+                                                    align: 'center'
+                                                }
+                                            },
+                                            y1: {
+                                                display: true,
+                                                type: 'linear',
+                                                grid: {
+                                                    borderColor: 'green'
+                                                },
+                                                ticks: {
+                                                    color: 'green',
+                                                    callback: function (val) {
+                                                        return val + " BPM";
+                                                    },
+                                                },
+                                                title: {
+                                                    display: true,
+                                                    font: {
+                                                        size: 20,
+                                                        weight: 'bold',
+                                                    },
+                                                    text: "",
+                                                    align: 'center'
+                                                }
+                                            },
+                                            y2: {
+                                                display: true,
+                                                type: 'linear',
+                                                grid: {
+                                                    borderColor: 'blue'
+                                                },
+                                                ticks: {
+                                                    color: 'blue',
+                                                    callback: function (val) {
+                                                        return val + " W";
+                                                    },
+                                                },
+                                                title: {
+                                                    display: true,
+                                                    font: {
+                                                        size: 20,
+                                                        weight: 'bold',
+                                                    },
+                                                    text: "",
+                                                    align: 'center'
                                                 }
                                             }
+                                        },
+                                        interaction : {
+                                            intersect: false,
+                                            mode : 'nearest',
+                                            axis: 'x'
+                                        },
+                                        plugins : {
+                                            tooltip : {
+                                                position: 'nearest',
+                                                titleFont: {
+                                                    family: "'Helvetica','Arial','sans-serif'",
+                                                    size: 24,
+                                                    weight: 'bold',
+                                                },
+                                                bodyFont: {
+                                                    family: "'Helvetica','Arial','sans-serif'",
+                                                    size: 12,
+                                                    weight: 'normal',
+                                                },
+                                                bodySpacing: 10,
+                                                padding: 20,
+                                                boxWidth: 3,
+                                            }
                                         }
-                                    };
-                                    return config;
-                                }
+                                    }
+                                };
 
                                 var multiChart = new Chart (
                                     document.getElementById('multiGraph'),
-                                    returnConfig(multiData)
+                                    config
                                 )
                             </script>
                             <script>
