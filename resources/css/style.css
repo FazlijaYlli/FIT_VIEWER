@@ -1,0 +1,181 @@
+/*
+    ETML
+    AUTEUR : YLLI FAZLIJA
+    DATE : 27.05.2021
+    DESCRIPTION : FICHIER DE STYLE CSS DE MON SITE WEB
+*/
+
+body {
+    font-family: Helvetica, Arial, sans-serif;
+    background-color: #151526;
+    width: 100%;
+    height: 3000px;
+    color: whitesmoke;
+    margin: 96px auto 155px auto;
+}
+
+header {
+    background-color: #3D3C4F;
+    width: 100%;
+    top: 0;
+    position: fixed;
+}
+
+footer {
+    display: flex;
+    width: 100%;
+    margin-top: 30px;
+    background-color: #3D3C4F;
+    font-size: 20pt;
+    font-weight: bold;
+    flex-direction: column;
+    position: fixed;
+    bottom: 0;
+}
+
+h1 {
+    margin: 10px 0 !important;
+}
+
+h2 {
+    margin: 15px 30px 0px 30px !important;
+}
+
+a {
+    text-decoration: none;
+    color: whitesmoke;
+}
+
+.title {
+    font-size: 48pt;
+    font-weight: bold;
+    margin: 80px 0 10px 0;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    margin: auto;
+}
+
+.light-bar {
+    background-color: #4E4D66;
+    padding: 10px 0px;
+    width: 100%;
+}
+
+.date {
+    color: darkgray;
+    font-weight: bold;
+    width: 75%;
+    margin: auto;
+}
+.header-elements {
+    display: flex;
+    flex-direction: row;
+    margin: auto;
+    width: 75%;
+}
+
+.footer-elements {
+    margin: 20px auto 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    text-align: center;
+    justify-content: space-between;
+    width: 75%;
+}
+
+.footer-element {
+    width: 33%;
+    margin: 0 0 20px 0;
+    text-align: center;
+}
+
+.primary-text {
+    color: whitesmoke;
+    font-weight: bold;
+    font-size: 18pt;
+}
+
+.secondary-text {
+    color: darkgray;
+    font-size: 15pt;
+}
+
+.blue-button {
+     font-size: 14pt;
+     font-weight: bold;
+     padding: 15px 30px 15px 30px;
+     margin: 30px 0 30px 0;
+     color: whitesmoke;
+     background-color: #4C799E;
+     border: none;
+     border-radius: 15px;
+     cursor: pointer;
+ }
+
+.gray-button {
+    font-size: 14pt;
+    font-weight: bold;
+    padding: 15px 30px 15px 30px;
+    margin: 30px 0 30px 0;
+    color: whitesmoke;
+    background-color: #666666;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+}
+
+.green-button {
+    font-size: 14pt;
+    font-weight: bold;
+    padding: 15px 30px 15px 30px;
+    margin: 30px 0 30px 0;
+    color: whitesmoke;
+    background-color: #699E42;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+}
+
+.error {
+    background-color: #ffd0d0;
+    padding: 20px 20px 20px 40px;
+    color: #cd3b3b;
+    font-weight: bold;
+    border-color: #cd3b3b;
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 15px;
+}
+
+.file-info {
+    display: flex;
+    margin: auto;
+    width: 75%;
+    align-items: start;
+    flex-direction: column;
+}
+
+.general-infos {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.general-info {
+    margin: 10px;
+}
+
+input[type=file] {
+    display: none;
+}
+
+.chart {
+    width: 75%;
+    height: 400px;
+    margin: 30px auto 30px auto;
+}
