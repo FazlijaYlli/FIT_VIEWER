@@ -60,8 +60,17 @@ $options = [
                                 $bpmJS = array();
                                 $powerJS = array();
                                 $confirm = true;
+
+                                $altitudeConfirm = true;
+                                $bpmConfirm = true;
+                                $powerConfirm = true;
+
+                                $altitudePresent = false;
+                                $bpmPresent = false;
+                                $powerPresent = false;
+
                                 //The program will take one out of 'numberPoints' points.
-                                $numberPoints = 10;
+                                $numberPoints = 5;
                                 $timestamps = array();
                                 $i = 0;
                                 foreach($pFFA->data_mesgs['record']['timestamp'] as $timestamp)
@@ -70,54 +79,86 @@ $options = [
                                     {
                                         if(!isset($pFFA->data_mesgs['record']['power'][$timestamp]))
                                         {
-                                            $confirm = false;
+                                            $powerConfirm = false;
                                         }
+                                        else
+                                        {
+                                            $powerPresent = true;
+                                        }
+
                                         if(!isset($pFFA->data_mesgs['record']['heart_rate'][$timestamp]))
                                         {
-                                            $confirm = false;
+                                            $bpmConfirms = false;
                                         }
+                                        else if ($pFFA->data_mesgs['record']['heart_rate'][$timestamp] == 0)
+                                        {
+                                            $bpmConfirm = false;
+                                        }
+                                        else
+                                        {
+                                            $bpmPresent = true;
+                                        }
+
                                         if(!isset($pFFA->data_mesgs['record']['altitude'][$timestamp]))
                                         {
-                                            $confirm = false;
+                                            $altitudeConfirm = false;
                                         }
                                         else if ($pFFA->data_mesgs['record']['altitude'][$timestamp] == 0)
                                         {
-                                            $confirm = false;
+                                            $altitudeConfirm = false;
+                                        }
+                                        else
+                                        {
+                                            $altitudePresent = true;
                                         }
                                     }
 
-                                    if($i % $numberPoints == 0 && $confirm)
+                                    if($i % $numberPoints == 0)
                                     {
-                                        $powerJS[] = $pFFA->data_mesgs['record']['power'][$timestamp];
-                                        $bpmJS[] = $pFFA->data_mesgs['record']['heart_rate'][$timestamp];
-                                        $altitudeJS[] = $pFFA->data_mesgs['record']['altitude'][$timestamp];
+                                        if($altitudeConfirm)
+                                        {
+                                            $altitudeJS[] = $pFFA->data_mesgs['record']['altitude'][$timestamp];
+                                        }
+
+                                        if($bpmConfirm)
+                                        {
+                                            $bpmJS[] = $pFFA->data_mesgs['record']['heart_rate'][$timestamp];
+                                        }
+
+                                        if($powerConfirm)
+                                        {
+                                            $powerJS[] = $pFFA->data_mesgs['record']['power'][$timestamp];
+                                        }
+
                                         //Insert the timestamp in the $count array.
                                         $timestamps[] = gmdate('H:i:s',$timestamp - $pFFA->data_mesgs['session']['start_time']);
-                                    }
-                                    else if ($i % $numberPoints == 0)
-                                    {
-                                        $confirm = true;
-                                    }
 
+                                        $altitudeConfirm = true;
+                                        $bpmConfirm = true;
+                                        $powerConfirm = true;
+                                    }
                                     $i++;
                                 }
                             ?>
                             <script type="text/javascript">
-                                var altitudeArray = <?php echo json_encode($altitudeJS); ?>;
-                                var bpmArray = <?php echo json_encode($bpmJS); ?>;
-                                var powerArray = <?php echo json_encode($powerJS); ?>;
-                                var numberPoints = <?php echo $numberPoints; ?>;
-                                var numbersArray = <?php echo json_encode($timestamps); ?>;
+                                const altitudeArray = <?php echo json_encode($altitudeJS); ?>;
+                                const bpmArray = <?php echo json_encode($bpmJS); ?>;
+                                const powerArray = <?php echo json_encode($powerJS); ?>;
+                                const numberPoints = <?php echo $numberPoints; ?>;
+                                const numbersArray = <?php echo json_encode($timestamps); ?>;
 
-                                console.log(altitudeArray);
-                                console.log(powerArray);
-                                console.log(numbersArray);
+                                const altitudePresent = !!parseInt(<?php echo $altitudePresent; ?>);
+                                const powerPresent = !!parseInt(<?php echo $powerPresent; ?>);
+                                const bpmPresent = !!parseInt(<?php echo $bpmPresent; ?>);
+
+                                console.log(bpmArray);
 
                                 //CHART DATA
                                 const multiData ={
                                     labels: numbersArray,
                                     datasets: [{
                                         label: '   (m) Altitude ',
+                                        display: altitudePresent,
                                         //Styling
                                         backgroundColor: '#4C799E',
                                         borderColor: '#4C799E',
@@ -127,6 +168,7 @@ $options = [
                                         yAxisID: 'y',
                                     },{
                                         label: '   BPM ',
+                                        display: bpmPresent,
                                         //Styling
                                         backgroundColor: '#699E42',
                                         borderColor: '#699E42',
@@ -136,6 +178,7 @@ $options = [
                                         yAxisID: 'y1',
                                     },{
                                         label: '   (W) Puissance ',
+                                        display: powerPresent,
                                         //Styling
                                         backgroundColor: '#CD3B3B',
                                         borderColor: '#CD3B3B',
@@ -145,6 +188,8 @@ $options = [
                                         yAxisID: 'y2',
                                     }],
                                 };
+
+                                console.log(altitudePresent);
 
                                 //CHART CONFIG
                                 const config = {
@@ -177,7 +222,7 @@ $options = [
                                                 }
                                             },
                                             y: {
-                                                display: true,
+                                                display: altitudePresent,
                                                 type: 'linear',
                                                 grid: {
                                                     borderColor: '#4C799E',
@@ -204,7 +249,7 @@ $options = [
                                                 }
                                             },
                                             y1: {
-                                                display: true,
+                                                display: bpmPresent,
                                                 type: 'linear',
                                                 grid: {
                                                     borderColor: '#699E42',
@@ -230,7 +275,7 @@ $options = [
                                                 }
                                             },
                                             y2: {
-                                                display: true,
+                                                display: powerPresent,
                                                 type: 'linear',
                                                 grid: {
                                                     borderColor: '#cd3b3b',
