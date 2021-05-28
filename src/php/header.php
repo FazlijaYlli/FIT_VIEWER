@@ -13,7 +13,7 @@
         </div>
     </div>
     <div class="header-elements">
-        <h1 style="margin-left: 50px">TPI - FIT FILE VIEWER</h1>
+        <a href="upload.php"><h1 style="margin-left: 50px">TPI - FIT FILE VIEWER</h1></a>
         <h2 class="secondary-text">Par Ylli Fazlija</h2>
     </div>
 </header>

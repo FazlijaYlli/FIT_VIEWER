@@ -5,24 +5,80 @@
     DESCRIPTION : FICHIER DE STYLE CSS DE MON SITE WEB
 */
 
+@keyframes slideInFromLeft {
+    0% {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    100% {
+        transform: translateX(0);
+        opacity: 100%;
+    }
+}
+
+@keyframes slideInFromRight {
+    0% {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    100% {
+        transform: translateX(0);
+        opacity: 100%;
+    }
+}
+
+@keyframes slideInFromTop {
+    0% {
+        transform: translateY(-100%);
+    }
+    100% {
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInFromBottom {
+    0% {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 100%;
+    }
+}
+
+@keyframes goGreen {
+    0% {
+        background-color: #666666;
+    }
+    100% {
+        background-color: #699E42;
+    }
+}
+
 body {
+
     font-family: Helvetica, Arial, sans-serif;
     background-color: #151526;
     width: 100%;
-    height: 3000px;
+    height: 100%;
     color: whitesmoke;
-    margin: 96px auto 155px auto;
+    margin: auto;
 }
 
 header {
+    animation: 1s ease-out 0s 1 slideInFromTop;
     background-color: #3D3C4F;
     width: 100%;
+    z-index: 5;
     top: 0;
     position: fixed;
 }
 
 footer {
+    animation: 1s ease-out 0s 1 slideInFromBottom;
     display: flex;
+    z-index: 1;
     width: 100%;
     margin-top: 30px;
     background-color: #3D3C4F;
@@ -47,13 +103,16 @@ a {
 }
 
 .title {
+    animation: 1s ease-out 0s 1 slideInFromTop;
     font-size: 48pt;
     font-weight: bold;
     margin: 80px 0 10px 0;
 }
 
 .container {
+    animation: 1s ease-out 0s 1 slideInFromTop;
     display: flex;
+    z-index: 0;
     flex-direction: column;
     align-items: center;
     height: 100%;
@@ -107,6 +166,7 @@ a {
 }
 
 .blue-button {
+     animation: 1s ease-out 0s 1 slideInFromTop;
      font-size: 14pt;
      font-weight: bold;
      padding: 15px 30px 15px 30px;
@@ -131,6 +191,7 @@ a {
 }
 
 .green-button {
+    animation: 0.5s ease-out 0s 1 goGreen;
     font-size: 14pt;
     font-weight: bold;
     padding: 15px 30px 15px 30px;
@@ -161,7 +222,8 @@ a {
     flex-direction: column;
 }
 
-.general-infos {
+.general-info-group {
+    animation: 1s ease-out 0s 1 slideInFromTop;
     display: flex;
     flex-wrap: wrap;
 }
@@ -170,12 +232,39 @@ a {
     margin: 10px;
 }
 
-input[type=file] {
-    display: none;
+.card-group {
+    animation: 1s ease-out 0s 1 slideInFromLeft;
+    display: flex;
+    flex-direction: column;
+    width: 33%;
+    margin: auto;
+}
+
+.card {
+    background-color: #4C799E;
+    margin: 30px 0 30px 0;
+    padding: 30px;
+    border-radius: 15px;
+}
+
+.card-info-group {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.card-info {
+    width: 33%;
 }
 
 .chart {
+    animation: 1s ease-out 0s 1 slideInFromLeft;
     width: 75%;
     height: 400px;
     margin: 30px auto 30px auto;
 }
+
+input[type=file] {
+    display: none;
+}
+

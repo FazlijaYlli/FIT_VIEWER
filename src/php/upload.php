@@ -14,11 +14,10 @@ session_start();
     <link href="../../resources/css/style.css" type="text/css" rel="stylesheet">
     <title>Téléchargement d'un fichier</title>
 </head>
-<body style="height: 500px">
+<body style="height: 500px;">
     <?php include 'header.php'; ?>
     <div class="container">
-
-        <div class="title">Bienvenue sur Fit Viewer !</div>
+        <div class="title" style="margin-top: 182px">Bienvenue sur FFV !</div>
         <?php
         if(isset($_SESSION['errors']))
         {
