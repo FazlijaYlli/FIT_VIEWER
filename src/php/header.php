@@ -1,3 +1,12 @@
+<?php
+$url = 'http://' . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
+
+if(strpos($url, 'header') !== false)
+{
+    header("Location:upload.php");
+}
+?>
+
 <header>
     <div class="light-bar">
         <div class="date">

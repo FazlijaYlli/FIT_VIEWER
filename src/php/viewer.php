@@ -151,8 +151,6 @@ $options = [
                                 const powerPresent = !!parseInt(<?php echo $powerPresent; ?>);
                                 const bpmPresent = !!parseInt(<?php echo $bpmPresent; ?>);
 
-                                console.log(bpmArray);
-
                                 //CHART DATA
                                 const multiData ={
                                     labels: numbersArray,
@@ -188,8 +186,6 @@ $options = [
                                         yAxisID: 'y2',
                                     }],
                                 };
-
-                                console.log(altitudePresent);
 
                                 //CHART CONFIG
                                 const config = {

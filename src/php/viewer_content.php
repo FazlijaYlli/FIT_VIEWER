@@ -1,3 +1,18 @@
+<?php
+if(!isset($_FILES['inputFile']))
+{
+    if(!isset($_SESSION['errors']))
+    {
+        $_SESSION['errors'] = array();
+    }
+    $errors = $_SESSION['errors'];
+    $errors[] = "Une erreur inconnue s'est produite";
+    $_SESSION['errors'] = $errors;
+    header('Location:upload.php');
+    exit();
+}
+?>
+
 <html>
 <head>
     <meta charset="UTF-8">

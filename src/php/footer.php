@@ -1,3 +1,12 @@
+<?php
+$url = 'http://' . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
+
+if(strpos($url, 'footer') !== false)
+{
+    header("Location:upload.php");
+}
+?>
+
 <div class="footer-elements">
     <div class="footer-element" style="text-align: left"> TPI</div>
     <div class="footer-element"> ETML </div>
