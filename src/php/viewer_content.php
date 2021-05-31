@@ -170,7 +170,7 @@
             }
             else
             {
-                echo 'L\'altitude n\'est pas indiquée dans ce fichier ! <br>';
+                echo 'La puissance n\'est pas indiquée dans ce fichier ! <br>';
             }
             ?>
         </div>
